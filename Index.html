@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Greek Flashcards - Cases & Vocabulary</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Georgia', serif;
+        background: linear-gradient(135deg, #6B73FF 0%, #000DFF 100%);
+        min-height: 100vh;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .container {
+        max-width: 800px;
+        width: 100%;
+    }
+
+    .header {
+        text-align: center;
+        color: white;
+        margin-bottom: 30px;
+    }
+
+    h1 {
+        font-size: 2.5em;
+        margin-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .deck-selector {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+    }
+
+    .deck-btn {
+        padding: 12px 25px;
+        background: white;
+        color: #6B73FF;
+        border: none;
+        border-radius: 25px;
+        font-size: 1.1em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .deck-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+
+    .deck-btn.active {
+        background: #FFD700;
+        color: #333;
+    }
+
+    .flashcard-container {
+        perspective: 1000px;
+        height: 400px;
+        margin-bottom: 30px;
+    }
+
+    .flashcard {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        transition: transform 0.6s;
+        transform-style: preserve-3d;
+        cursor: pointer;
+    }
+
+    .flashcard.flipped {
+        transform: rotateY(180deg);
+    }
+
+    .card-face {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .card-front {
+        background: white;
+        color: #333;
+    }
+
+    .card-back {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        transform: rotateY(180deg);
+    }
+
+    .card-content {
+        text-align: center;
+        width: 100%;
+    }
+
+    .greek-text {
+        font-size: 3em;
+        margin-bottom: 20px;
+        line-height: 1.3;
+    }
+
+    .english-text {
+        font-size: 1.8em;
+        line-height: 1.4;
+    }
+
+    .card-label {
+        font-size: 0.9em;
+        color: #666;
+        margin-bottom: 15px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    .controls {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap; 
+    }
+
+    .control-btn {
+        padding: 12px 30px;
+        background: white;
+        color: #6B73FF;
+        border: none;
+        border-radius: 10px;
+        font-size: 1.1em;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .control-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+
+    .progress {
+        background: rgba(255,255,255,0.2);
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        color: white;
+        margin-bottom: 20px;
+    }
+
+    .progress-bar {
+        background: rgba(255,255,255,0.3);
+        height: 10px;
+        border-radius: 5px;
+        margin-top: 10px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        background: #FFD700;
+        height: 100%;
+        transition: width 0.3s;
+    }
+
+    .stats {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 15px;
+    }
+
+    .stat {
+        text-align: center;
+    }
+
+    .stat-value {
+        font-size: 1.5em;
+        font-weight: bold;
+    }
+
+    .stat-label {
+        font-size: 0.9em;
+        opacity: 0.8;
+    }
+
+    .add-vocab-section {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-top: 30px;
+        display: none;
+    }
+
+    .add-vocab-section.show {
+        display: block;
+    }
+
+    .input-group {
+        margin-bottom: 15px;
+    }
+
+    .input-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .input-group input {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        font-size: 1.1em;
+    }
+
+    .add-btn {
+        background: #4CAF50;
+        color: white;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 5px;
+        font-size: 1.1em;
+        cursor: pointer;
+        width: 100%;
+    }
+
+    .add-btn:hover {
+        background: #45a049;
+    }
+
+    .hint {
+        background: #fff3cd;
+        border: 2px solid #ffc107;
+        border-radius: 10px;
+        padding: 15px;
+        margin-top: 20px;
+        display: none;
+    }
+
+    .hint.show {
+        display: block;
+    }
+
+    .table-view {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        display: none;
+    }
+
+    .table-view.show {
+        display: block;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: center;
+    }
+
+    th {
+        background: #f0f0f0;
+        font-weight: bold;
+    }
+
+    .greek-cell {
+        font-size: 1.3em;
+        color: #6B73FF;
+    }
+
+    .toggle-view-btn {
+        background: #FF9800;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-bottom: 20px;
+    }
+    
+    .table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    @media (max-width: 768px) {
+        body {
+            padding: 10px; 
+        }
+
+        h1 {
+            font-size: 2em; 
+        }
+
+        .header p {
+            font-size: 0.9em;
+        }
+
+        .deck-btn, .control-btn {
+            font-size: 1em; 
+            padding: 10px 20px;
+        }
+
+        .flashcard-container {
+            height: 350px; 
+        }
+        
+        .card-face {
+            padding: 20px; 
+        }
+
+        .greek-text {
+            font-size: 2.2em; 
+        }
+
+        .english-text {
+            font-size: 1.4em; 
+        }
+
+        .stats {
+            padding: 0 10px; 
+        }
+
+        .stat-value {
+            font-size: 1.3em;
+        }
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>📚 Greek Flashcards</h1>
+        <p>Nominative & Accusative Cases • Chapter 6 Vocabulary</p>
+        <p style="font-size: 0.9em; margin-top: 5px;">Click cards to flip</p>
+    </div>
+
+    <div class="deck-selector">
+        <button class="deck-btn active" data-deck="case-endings">Nom/Acc Endings</button>
+        <button class="deck-btn" data-deck="vocab">Vocabulary (35 words)</button>
+        <button class="deck-btn" data-deck="mixed">Mixed Practice</button>
+        <button class="toggle-view-btn">📊 View Tables</button>
+    </div>
+
+    <div class="progress">
+        <div>Card <span id="currentCard">1</span> of <span id="totalCards">1</span></div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value" id="knownCount">0</div>
+                <div class="stat-label">Known</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="learningCount">0</div>
+                <div class="stat-label">Learning</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="reviewCount">0</div>
+                <div class="stat-label">To Review</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-view" id="tableView">
+        <h2>Case Endings Reference Tables</h2>
+        
+        <div class="table-wrapper">
+            <h3 style="margin-top: 20px;">First Declension (Feminine)</h3>
+            <table>
+                <tr>
+                    <th>Case</th>
+                    <th>Singular</th>
+                    <th>Plural</th>
+                </tr>
+                <tr>
+                    <td><strong>Nominative</strong><br>(subject)</td>
+                    <td class="greek-cell">-η / -α</td>
+                    <td class="greek-cell">-αι</td>
+                </tr>
+                <tr>
+                    <td><strong>Accusative</strong><br>(direct object)</td>
+                    <td class="greek-cell">-ην / -αν</td>
+                    <td class="greek-cell">-ας</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="table-wrapper">
+            <h3 style="margin-top: 20px;">Second Declension</h3>
+            <table>
+                <tr>
+                    <th>Case</th>
+                    <th>Masc. Sing.</th>
+                    <th>Masc. Plur.</th>
+                    <th>Neut. Sing.</th>
+                    <th>Neut. Plur.</th>
+                </tr>
+                <tr>
+                    <td><strong>Nominative</strong><br>(subject)</td>
+                    <td class="greek-cell">-ος</td>
+                    <td class="greek-cell">-οι</td>
+                    <td class="greek-cell">-ον</td>
+                    <td class="greek-cell">-α</td>
+                </tr>
+                <tr>
+                    <td><strong>Accusative</strong><br>(direct object)</td>
+                    <td class="greek-cell">-ον</td>
+                    <td class="greek-cell">-ους</td>
+                    <td class="greek-cell">-ον</td>
+                    <td class="greek-cell">-α</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="table-wrapper">
+            <h3 style="margin-top: 20px;">The Article (ὁ, ἡ, τό)</h3>
+            <table>
+                <tr>
+                    <th>Case</th>
+                    <th>Masc. Sing.</th>
+                    <th>Fem. Sing.</th>
+                    <th>Neut. Sing.</th>
+                    <th>Masc. Plur.</th>
+                    <th>Fem. Plur.</th>
+                    <th>Neut. Plur.</th>
+                </tr>
+                <tr>
+                    <td><strong>Nominative</strong></td>
+                    <td class="greek-cell">ὁ</td>
+                    <td class="greek-cell">ἡ</td>
+                    <td class="greek-cell">τό</td>
+                    <td class="greek-cell">οἱ</td>
+                    <td class="greek-cell">αἱ</td>
+                    <td class="greek-cell">τά</td>
+                </tr>
+                <tr>
+                    <td><strong>Accusative</strong></td>
+                    <td class="greek-cell">τόν</td>
+                    <td class="greek-cell">τήν</td>
+                    <td class="greek-cell">τό</td>
+                    <td class="greek-cell">τούς</td>
+                    <td class="greek-cell">τάς</td>
+                    <td class="greek-cell">τά</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="flashcard-container">
+        <div class="flashcard" id="flashcard">
+            <div class="card-face card-front">
+                <div class="card-content">
+                    <div class="card-label">Case Ending</div>
+                    <div class="greek-text" id="frontText">-ος</div>
+                    <div style="color: #666; font-size: 1.2em;">Click to reveal</div>
+                </div>
+            </div>
+            <div class="card-face card-back">
+                <div class="card-content">
+                    <div class="card-label">Answer</div>
+                    <div class="english-text" id="backText">Nominative Singular<br>(2nd Declension Masculine)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="control-btn" id="prevBtn">←</button>
+        <button class="control-btn" id="knownBtn">✓ Know</button>
+        <button class="control-btn" id="learningBtn">~ Learning</button>
+        <button class="control-btn" id="nextBtn">→</button>
+    </div>
+
+    <div class="hint" id="hint">
+        <strong>💡 Memory Tip:</strong> <span id="hintText"></span>
+    </div>
+
+    <div class="add-vocab-section" id="addVocabSection">
+        <h3>Add Additional Vocabulary</h3>
+        <div class="input-group">
+            <label>Greek Word (with article if noun):</label>
+            <input type="text" id="greekWord" placeholder="e.g., λόγος, ὁ">
+        </div>
+        <div class="input-group">
+            <label>English Meaning:</label>
+            <input type="text" id="englishMeaning" placeholder="e.g., word, message">
+        </div>
+        <button class="add-btn" onclick="addVocabulary()">Add to Deck</button>
+        <p style="margin-top: 15px; color: #666;">Your textbook vocabulary has been pre-loaded! Add any additional words here.</p>
+    </div>
+</div>
+
+<script>
+    let currentDeck = 'case-endings';
+    let currentIndex = 0;
+    let isFlipped = false;
+    let cardStats = {};
+
+    const caseEndings = [
+        { greek: "-η / -α", english: "Nominative Singular\n(1st Declension)", hint: "Subject of sentence - Feminine nouns" },
+        { greek: "-ην / -αν", english: "Accusative Singular\n(1st Declension)", hint: "Direct object - what receives the action" },
+        { greek: "-αι", english: "Nominative Plural\n(1st Declension)", hint: "Plural subjects - the '-αι' diphthong" },
+        { greek: "-ας", english: "Accusative Plural\n(1st Declension)", hint: "Multiple direct objects (feminine)" },
+        { greek: "-ος", english: "Nominative Singular\n(2nd Decl. Masculine)", hint: "The typical masculine subject ending" },
+        { greek: "-ον", english: "Accusative Singular\n(2nd Decl. Masc)", hint: "Direct object - masculine singular" },
+        { greek: "-οι", english: "Nominative Plural\n(2nd Decl. Masculine)", hint: "Plural masculine subjects" },
+        { greek: "-ους", english: "Accusative Plural\n(2nd Decl. Masculine)", hint: "Multiple masculine direct objects" },
+        { greek: "-ον", english: "Nom/Acc Singular\n(2nd Decl. Neuter)", hint: "Neuter: Nom and Acc are always the same!" },
+        { greek: "-α", english: "Nom/Acc Plural\n(2nd Decl. Neuter)", hint: "Neuter plural always ends in -α for both cases" },
+        { greek: "ὁ", english: "The (Nom. Sing. Masc.)", hint: "Masculine subject article" },
+        { greek: "ἡ", english: "The (Nom. Sing. Fem.)", hint: "Feminine subject article - rough breathing!" },
+        { greek: "τό", english: "The (Nom/Acc. Sing. Neut.)", hint: "Neuter article - same for both cases" },
+        { greek: "τόν", english: "The (Acc. Sing. Masc.)", hint: "Masculine direct object article" },
+        { greek: "τήν", english: "The (Acc. Sing. Fem.)", hint: "Feminine direct object article" },
+        { greek: "οἱ", english: "The (Nom. Plur. Masc.)", hint: "Plural masculine 'the'" },
+        { greek: "αἱ", english: "The (Nom. Plur. Fem.)", hint: "Plural feminine 'the'" },
+        { greek: "τά", english: "The (Nom/Acc. Plur. Neut.)", hint: "Neuter plural article - same for both" },
+        { greek: "τούς", english: "The (Acc. Plur. Masc.)", hint: "Masculine plural direct object" },
+        { greek: "τάς", english: "The (Acc. Plur. Fem.)", hint: "Feminine plural direct object" }
+    ];
+    
+    const textbookVocab = [
+        { greek: "Ἀβραάμ, ὁ", english: "Abraham", hint: "Indeclinable proper noun" },
+        { greek: "ἄγγελος, ὁ", english: "angel, messenger", hint: "2nd declension masculine" },
+        { greek: "ἄνθρωπος, ὁ", english: "man, mankind, person", hint: "2nd declension masculine" },
+        { greek: "ἀπόστολος, ὁ", english: "apostle, messenger", hint: "2nd declension masculine" },
+        { greek: "Γαλιλαία, ἡ", english: "Galilee", hint: "1st declension feminine" },
+        { greek: "γραφή, ἡ", english: "writing, Scripture", hint: "1st declension feminine" },
+        { greek: "Δαυίδ, ὁ", english: "David", hint: "Indeclinable proper noun" },
+        { greek: "δόξα, ἡ", english: "glory, majesty", hint: "1st declension feminine" },
+        { greek: "ζωή, ἡ", english: "life", hint: "1st declension feminine" },
+        { greek: "θεός, ὁ", english: "God, god", hint: "2nd declension masculine" },
+        { greek: "καρδία, ἡ", english: "heart", hint: "1st declension feminine" },
+        { greek: "κόσμος, ὁ", english: "world, universe", hint: "2nd declension masculine" },
+        { greek: "λόγος, ὁ", english: "word, Word, statement", hint: "2nd declension masculine" },
+        { greek: "Παῦλος, ὁ", english: "Paul", hint: "2nd declension masculine" },
+        { greek: "Πέτρος, ὁ", english: "Peter", hint: "2nd declension masculine" },
+        { greek: "Πιλᾶτος, ὁ", english: "Pilate", hint: "2nd declension masculine" },
+        { greek: "πνεῦμα, τό", english: "spirit, Spirit, wind", hint: "3rd declension neuter (later chapter)" },
+        { greek: "προφήτης, ὁ", english: "prophet", hint: "1st declension masculine (exception)" },
+        { greek: "σάββατον, τό", english: "Sabbath", hint: "2nd declension neuter" },
+        { greek: "Σίμων, ὁ", english: "Simon", hint: "3rd declension (later chapter)" },
+        { greek: "φωνή, ἡ", english: "sound, voice", hint: "1st declension feminine" },
+        { greek: "Χριστός, ὁ", english: "Christ, Messiah", hint: "2nd declension masculine" },
+        { greek: "ἀγάπη, ἡ", english: "love", hint: "1st declension - the famous agape love" },
+        { greek: "ἄλλος, -η, -ο", english: "other, another", hint: "Adjective - follows 2-1-2 pattern" },
+        { greek: "αὐτός, -ή, -ό", english: "he, she, it (sing.); they (plur.)", hint: "3rd person pronoun - masculine only for now" },
+        { greek: "βασιλεία, ἡ", english: "kingdom", hint: "1st declension feminine" },
+        { greek: "δέ", english: "but, and", hint: "Postpositive - never first in sentence" },
+        { greek: "ἐν", english: "in, on, among", hint: "Preposition + dative (you'll learn dative later)" },
+        { greek: "ἔργον, τό", english: "work, deed, action", hint: "2nd declension neuter" },
+        { greek: "καιρός, ὁ", english: "(appointed) time, season", hint: "2nd declension masculine" },
+        { greek: "νῦν", english: "now (adverb); the present (noun)", hint: "Can function as adverb or noun" },
+        { greek: "ὁ, ἡ, τό", english: "the", hint: "Definite article - know all forms!" },
+        { greek: "ὅτι", english: "that, since, because", hint: "Can introduce quotes or give reasons" },
+        { greek: "οὐ (οὐκ, οὐχ)", english: "not", hint: "οὐ before consonant, οὐκ before smooth breathing, οὐχ before rough" },
+        { greek: "ὥρα, ἡ", english: "hour, occasion, moment", hint: "1st declension feminine" }
+    ];
+
+    let userVocabulary = JSON.parse(localStorage.getItem('greekVocab') || '[]');
+
+    if (userVocabulary.length === 0) {
+        userVocabulary = [...textbookVocab];
+        localStorage.setItem('greekVocab', JSON.stringify(userVocabulary));
+    }
+    let currentCards = [...caseEndings];
+
+    function selectDeck(deck, buttonElement) {
+        currentDeck = deck;
+        document.querySelectorAll('.deck-btn').forEach(btn => btn.classList.remove('active'));
+        buttonElement.classList.add('active');
+
+        if (deck === 'case-endings') {
+            currentCards = [...caseEndings];
+            document.getElementById('addVocabSection').classList.remove('show');
+        } else if (deck === 'vocab') {
+            currentCards = [...userVocabulary];
+            document.getElementById('addVocabSection').classList.add('show');
+        } else if (deck === 'mixed') {
+            currentCards = [...caseEndings, ...userVocabulary];
+            document.getElementById('addVocabSection').classList.remove('show');
+        }
+        currentIndex = 0;
+        updateCard();
+    }
+
+    function flipCard() {
+        const flashcard = document.getElementById('flashcard');
+        isFlipped = !isFlipped;
+        flashcard.classList.toggle('flipped');
+        if (isFlipped && currentCards[currentIndex].hint) {
+            document.getElementById('hintText').textContent = currentCards[currentIndex].hint;
+            document.getElementById('hint').classList.add('show');
+        } else {
+            document.getElementById('hint').classList.remove('show');
+        }
+    }
+
+    function updateCard() {
+        if (currentCards.length === 0) return;
+        const card = currentCards[currentIndex];
+        document.getElementById('frontText').textContent = card.greek;
+        document.getElementById('backText').innerHTML = card.english.replace(/\n/g, '<br>');
+        if (isFlipped) {
+            document.getElementById('flashcard').classList.remove('flipped');
+            isFlipped = false;
+        }
+        document.getElementById('currentCard').textContent = currentIndex + 1;
+        document.getElementById('totalCards').textContent = currentCards.length;
+        document.getElementById('progressFill').style.width = ((currentIndex + 1) / currentCards.length * 100) + '%';
+        document.getElementById('hint').classList.remove('show');
+        updateStats();
+    }
+
+    function nextCard() {
+        currentIndex = (currentIndex + 1) % currentCards.length;
+        updateCard();
+    }
+
+    function previousCard() {
+        currentIndex = (currentIndex - 1 + currentCards.length) % currentCards.length;
+        updateCard();
+    }
+
+    function markKnown() {
+        const cardKey = currentCards[currentIndex].greek;
+        cardStats[cardKey] = 'known';
+        updateStats();
+        nextCard();
+    }
+
+    function markLearning() {
+        const cardKey = currentCards[currentIndex].greek;
+        cardStats[cardKey] = 'learning';
+        updateStats();
+        nextCard();
+    }
+
+    function updateStats() {
+        let known = 0, learning = 0, review = 0;
+        currentCards.forEach(card => {
+            const status = cardStats[card.greek];
+            if (status === 'known') known++;
+            else if (status === 'learning') learning++;
+            else review++;
+        });
+        document.getElementById('knownCount').textContent = known;
+        document.getElementById('learningCount').textContent = learning;
+        document.getElementById('reviewCount').textContent = review;
+    }
+
+    function addVocabulary() {
+        const greek = document.getElementById('greekWord').value.trim();
+        const english = document.getElementById('englishMeaning').value.trim();
+        if (!greek || !english) {
+            alert('Please fill in both fields!');
+            return;
+        }
+        const newWord = {
+            greek: greek,
+            english: english,
+            hint: "From your vocabulary list"
+        };
+        userVocabulary.push(newWord);
+        localStorage.setItem('greekVocab', JSON.stringify(userVocabulary));
+        document.getElementById('greekWord').value = '';
+        document.getElementById('englishMeaning').value = '';
+        if (currentDeck === 'vocab') {
+            currentCards = [...userVocabulary];
+            updateCard();
+        }
+        alert('Word added successfully!');
+    }
+
+    function toggleTableView() {
+        const tableView = document.getElementById('tableView');
+        tableView.classList.toggle('show');
+    }
+
+    // Keyboard controls
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') previousCard();
+        else if (e.key === 'ArrowRight') nextCard();
+        else if (e.key === ' ') {
+            e.preventDefault();
+            flipCard();
+        }
+        else if (e.key === '1') markKnown();
+        else if (e.key === '2') markLearning();
+    });
+
+    //================================
+    //  MODERN EVENT LISTENERS
+    //================================
+    
+    document.querySelectorAll('.deck-btn').forEach(button => {
+        button.addEventListener('click', (event) => {
+            const deckName = event.currentTarget.dataset.deck;
+            selectDeck(deckName, event.currentTarget);
+        });
+    });
+    
+    document.querySelector('.toggle-view-btn').addEventListener('click', toggleTableView);
+    document.getElementById('flashcard').addEventListener('click', flipCard);
+    document.getElementById('prevBtn').addEventListener('click', previousCard);
+    document.getElementById('knownBtn').addEventListener('click', markKnown);
+    document.getElementById('learningBtn').addEventListener('click', markLearning);
+    document.getElementById('nextBtn').addEventListener('click', nextCard);
+
+    // Initialize
+    updateCard();
+</script>
+</body>
+</html>
